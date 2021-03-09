@@ -94,6 +94,17 @@ public class GcpComputeService {
         return instanceName;
     }
 
+    public String customMachineTypeSelfLink(MachineType machineType) throws Exception{
+        String customSelfLink = "https://www.googleapis.com/compute/v1/projects/flash-precept-306501/zones/us-central1-a/machineTypes/custom";
+        StringBuilder builder = new StringBuilder(customSelfLink);
+        builder.append("-").append(machineType.getGuestCpus());
+        builder.append("-").append(machineType.getMemoryMb());
+        machineType.setSelfLink(customSelfLink);
+
+        return  builder.toString();
+
+    }
+
 
     public boolean createComputeInstance(String instanceName, String applicationName) throws Exception, IOException, GeneralSecurityException {
 
@@ -105,8 +116,11 @@ public class GcpComputeService {
                 .map(MachineType::getSelfLink)
                 .collect(Collectors.joining());
 
-        log.info("e2MachineTypeSelfLink -> {}", e2MachineTypeSelfLink);
+//        MachineType machineType = new MachineType();
+//        machineType.setGuestCpus(2);
+//        machineType.setMemoryMb(4096);
 
+//        Operation operation = createInstance(compute, instanceName, customMachineTypeSelfLink(machineType));
         Operation operation = createInstance(compute, instanceName, e2MachineTypeSelfLink);
         Operation.Error error = blockUntilComplete(compute, operation, OPERATION_TIMEOUT_MILLIS);
 
