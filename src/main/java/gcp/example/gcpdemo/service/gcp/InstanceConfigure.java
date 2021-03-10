@@ -133,7 +133,6 @@ public class InstanceConfigure extends OperationErrorHandle{
                 .limit(1)
                 .collect(Collectors.joining());
 
-
 //        log.info(collect);
         // 해당 zone에 존재하는 머신 리스트 정보 가져옴
         return instanceName;
