@@ -5,7 +5,9 @@ import com.google.api.services.compute.model.Instance;
 import com.google.api.services.compute.model.MachineType;
 import com.google.api.services.compute.model.MachineTypeList;
 import com.google.api.services.compute.model.NetworkList;
+import gcp.example.gcpdemo.service.gcp.ComputeService;
 import gcp.example.gcpdemo.service.gcp.FirewallConfigure;
+import gcp.example.gcpdemo.service.gcp.InstanceConfigure;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +36,12 @@ public class GcpComputeServiceTest {
     GcpComputeService gcpComputeService;
 
     @Autowired
+    ComputeService computeService;
+    
+    @Autowired
+    InstanceConfigure instanceConfigure;
+
+    @Autowired
     FirewallConfigure firewallConfigure;
 
     @BeforeEach
@@ -44,7 +52,7 @@ public class GcpComputeServiceTest {
 
     @Test
     void testCreateInstance() throws Exception {
-        boolean isCreated = gcpComputeService.createComputeInstance(instanceName, applicationName);
+        boolean isCreated = computeService.createComputeInstance(instanceName, applicationName);
         assertEquals(isCreated, true);
     }
 
@@ -57,8 +65,9 @@ public class GcpComputeServiceTest {
 
     @Test
     void testDeleteInstance() throws Exception {
-        boolean b = gcpComputeService.deleteInstance(instanceName, applicationName);
-        assertEquals(true, b);
+        boolean b = instanceConfigure.deleteInstance(instanceName, applicationName);
+//        boolean b = gcpComputeService.deleteInstance(instanceName, applicationName);
+        assertTrue(b);
     }
 
     @Test

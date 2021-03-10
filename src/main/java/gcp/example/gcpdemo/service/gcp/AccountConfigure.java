@@ -4,12 +4,14 @@ import com.google.api.services.compute.model.ServiceAccount;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @Slf4j
-public class AccountConfigure extends OperationErrorHandle{
+public class AccountConfigure extends OperationErrorHandle implements BaseConfigure{
+
 
     public ServiceAccount accountConfig() {
         log.info("================== GCP accountConfig ==================");
@@ -22,5 +24,25 @@ public class AccountConfigure extends OperationErrorHandle{
         account.setScopes(scopes);
 
         return account;
+    }
+
+    @Override
+    public Object config(String applicationName) throws IOException {
+        return null;
+    }
+
+    @Override
+    public boolean update(String applicationName) throws Exception {
+        return false;
+    }
+
+    @Override
+    public boolean insert(String applicationName) throws Exception {
+        return false;
+    }
+
+    @Override
+    public boolean delete(String applicationName, String resourceName) throws Exception {
+        return false;
     }
 }

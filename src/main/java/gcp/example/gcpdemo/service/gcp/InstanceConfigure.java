@@ -1,10 +1,7 @@
 package gcp.example.gcpdemo.service.gcp;
 
 import com.google.api.services.compute.Compute;
-import com.google.api.services.compute.model.Instance;
-import com.google.api.services.compute.model.InstanceList;
-import com.google.api.services.compute.model.InstancesSetLabelsRequest;
-import com.google.api.services.compute.model.Operation;
+import com.google.api.services.compute.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -47,6 +44,8 @@ public class InstanceConfigure extends OperationErrorHandle{
         instance.setDisks(Collections.singletonList(diskConfigure.diskConfig(compute, instanceName)));
         //account 설정
         instance.setServiceAccounts(Collections.singletonList(accountConfigure.accountConfig()));
+        //mateData 설정 (script, ssh)
+        instance.setMetadata(metadataConfig());
 
         Compute.Instances.Insert insert = compute.instances().insert(PROJECT_ID, ZONE_NAME, instance);
         return insert.execute();
@@ -95,6 +94,33 @@ public class InstanceConfigure extends OperationErrorHandle{
             isUpdated = false;
         }
         return isUpdated;
+
+    }
+
+    public Metadata metadataConfig() {
+        Metadata metadata = new Metadata();
+        List<Metadata.Items> items = new ArrayList<>();
+        Metadata.Items item = new Metadata.Items();
+        item.setKey("startup-script");
+        item.setValue(createUserScript("test"));
+        items.add(item);
+        items.add(createSshSettings());
+        metadata.setItems(items);
+        return metadata;
+    }
+
+    public String createUserScript(String id) {
+        return "sudo useradd -m " + id;
+    }
+
+    public Metadata.Items createSshSettings(){
+        Metadata.Items item = new Metadata.Items();
+        StringBuilder builder = new StringBuilder();
+        builder.append("");
+        item.setKey("ssh-keys");
+        item.setValue(builder.toString());
+
+        return item;
 
     }
 
