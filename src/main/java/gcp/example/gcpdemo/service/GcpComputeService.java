@@ -10,6 +10,7 @@ import com.google.api.services.compute.model.*;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.common.collect.ImmutableList;
+import gcp.example.gcpdemo.service.gcp.OperationErrorHandle;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -20,16 +21,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class GcpComputeService {
-
-
-    //  private static final String PROJECT_ID = "YOUR_PROJECT_ID";
-    private static final String PROJECT_ID = "flash-precept-306501";
-
-    /**
-     * Set Compute Engine zone.
-     */
-    private static final String ZONE_NAME = "us-central1-a";
+public class GcpComputeService extends OperationErrorHandle {
 
     /**
      * Global instance of the HTTP transport.
@@ -122,7 +114,7 @@ public class GcpComputeService {
 
 //        Operation operation = createInstance(compute, instanceName, customMachineTypeSelfLink(machineType));
         Operation operation = createInstance(compute, instanceName, e2MachineTypeSelfLink);
-        Operation.Error error = blockUntilComplete(compute, operation, OPERATION_TIMEOUT_MILLIS);
+        Operation.Error error = blockUntilComplete(compute, operation);
 
         boolean isCreated;
         if (error == null) {
@@ -162,7 +154,7 @@ public class GcpComputeService {
                 compute.instances().delete(PROJECT_ID, ZONE_NAME, instanceName);
 
         Operation operation = delete.execute();
-        Operation.Error error = blockUntilComplete(compute, operation, OPERATION_TIMEOUT_MILLIS);
+        Operation.Error error = blockUntilComplete(compute, operation);
 
         boolean isDeleted;
         if (error == null) {
@@ -187,7 +179,7 @@ public class GcpComputeService {
         Compute.Instances.SetLabels setLabels = compute.instances().setLabels(PROJECT_ID, ZONE_NAME, getInstanceName(applicationName), requestBody);
 
         Operation execute = setLabels.execute();
-        Operation.Error error = blockUntilComplete(compute, execute, OPERATION_TIMEOUT_MILLIS);
+        Operation.Error error = blockUntilComplete(compute, execute);
 
         boolean isUpdated;
         if (error == null) {
@@ -348,36 +340,10 @@ public class GcpComputeService {
         return account;
     }
 
-    public static Operation.Error blockUntilComplete(Compute compute, Operation operation, long timeout) throws Exception {
-        long start = System.currentTimeMillis();
-        final long pollInterval = 5 * 1000;
-        String zone = operation.getZone(); // null for global/regional operations
-        if (zone != null) {
-            String[] bits = zone.split("/");
-            zone = bits[bits.length - 1];
-        }
-        String status = operation.getStatus();
-        String opId = operation.getName();
-        while (operation != null && !status.equals("DONE")) {
-            Thread.sleep(pollInterval);
-            long elapsed = System.currentTimeMillis() - start;
-            if (elapsed >= timeout) {
-                throw new InterruptedException("Timed out waiting for operation to complete");
-            }
-            System.out.println("waiting...");
-            if (zone != null) {
-                Compute.ZoneOperations.Get get = compute.zoneOperations().get(PROJECT_ID, zone, opId);
-                operation = get.execute();
-            } else {
-                Compute.GlobalOperations.Get get = compute.globalOperations().get(PROJECT_ID, opId);
-                operation = get.execute();
-            }
-            if (operation != null) {
-                status = operation.getStatus();
-            }
-        }
-        return operation == null ? null : operation.getError();
-    }
+
+
+
+
 
 
 }

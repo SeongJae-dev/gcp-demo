@@ -1,0 +1,66 @@
+package gcp.example.gcpdemo.service.gcp;
+
+import com.google.api.services.compute.Compute;
+import com.google.api.services.compute.model.AccessConfig;
+import com.google.api.services.compute.model.Network;
+import com.google.api.services.compute.model.NetworkInterface;
+import com.google.api.services.compute.model.NetworkList;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
+@Slf4j
+public class NetworkConfigure extends OperationErrorHandle{
+
+
+    /**
+     * Set the Network configuration values of the sample VM instance to be created.
+     */
+    private static final String NETWORK_INTERFACE_CONFIG = "ONE_TO_ONE_NAT";
+
+    private static final String NETWORK_ACCESS_CONFIG = "External NAT";
+
+
+
+    public NetworkList networkList(Compute compute) throws IOException {
+        log.info("================== GCP networkList List ==================");
+        Compute.Networks.List request = compute.networks().list(PROJECT_ID);
+        NetworkList response;
+        do {
+            response = request.execute();
+            if (response.getItems() == null) {
+                continue;
+            }
+            request.setPageToken(response.getNextPageToken());
+        } while (response.getNextPageToken() != null);
+
+        return response;
+    }
+
+
+    public NetworkInterface networkInterfaceConfig(Compute compute) throws IOException {
+        log.info("================== GCP networkInterfaceConfig ==================");
+        NetworkInterface networkInterface = new NetworkInterface();
+        String networkSelfLink = networkList(compute).getItems()
+                .stream()
+                .map(Network::getSelfLink)
+                .collect(Collectors.joining());
+
+        networkInterface.setNetwork(networkSelfLink);
+
+        List<AccessConfig> configs = new ArrayList<>();
+        AccessConfig config = new AccessConfig();
+        config.setType(NETWORK_INTERFACE_CONFIG);
+        config.setName(NETWORK_ACCESS_CONFIG);
+        configs.add(config);
+        networkInterface.setAccessConfigs(configs);
+//        networkInterface.setNetwork();
+
+        return networkInterface;
+    }
+}

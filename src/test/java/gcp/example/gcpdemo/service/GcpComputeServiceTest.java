@@ -5,6 +5,7 @@ import com.google.api.services.compute.model.Instance;
 import com.google.api.services.compute.model.MachineType;
 import com.google.api.services.compute.model.MachineTypeList;
 import com.google.api.services.compute.model.NetworkList;
+import gcp.example.gcpdemo.service.gcp.FirewallConfigure;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,8 +21,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import static net.bytebuddy.matcher.ElementMatchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class GcpComputeServiceTest {
@@ -32,6 +32,9 @@ public class GcpComputeServiceTest {
 
     @Autowired
     GcpComputeService gcpComputeService;
+
+    @Autowired
+    FirewallConfigure firewallConfigure;
 
     @BeforeEach
     void init() throws GeneralSecurityException, IOException {
@@ -104,6 +107,21 @@ public class GcpComputeServiceTest {
         machineType.setMemoryMb(2048);
         String s = gcpComputeService.customMachineTypeSelfLink(machineType);
         System.out.println(s);
+    }
+
+    @Test
+    void testFirewall() throws  Exception{
+//        boolean res = firewallConfigure.config(compute).insert(applicationName);
+//        boolean res = firewallConfigure.config(applicationName).update(applicationName);
+//        firewallConfigure.update(applicationName,"default-allow-mysql");
+        boolean res = firewallConfigure.delete(applicationName,"default-allow-mysql");
+        assertFalse(res);
+
+    }
+
+    @Test
+    void testAccountCreate() throws  Exception{
+
     }
 
 }
