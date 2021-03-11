@@ -5,9 +5,7 @@ import com.google.api.services.compute.model.Instance;
 import com.google.api.services.compute.model.MachineType;
 import com.google.api.services.compute.model.MachineTypeList;
 import com.google.api.services.compute.model.NetworkList;
-import gcp.example.gcpdemo.service.gcp.ComputeService;
-import gcp.example.gcpdemo.service.gcp.FirewallConfigure;
-import gcp.example.gcpdemo.service.gcp.InstanceConfigure;
+import gcp.example.gcpdemo.service.gcp.*;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +42,12 @@ public class GcpComputeServiceTest {
     @Autowired
     FirewallConfigure firewallConfigure;
 
+    @Autowired
+    NetworkConfigure networkConfigure;
+
+    @Autowired
+    AddressesConfig addressesConfig;
+
     @BeforeEach
     void init() throws GeneralSecurityException, IOException {
         System.out.println("init");
@@ -58,7 +62,7 @@ public class GcpComputeServiceTest {
 
 
     @Test
-    void testUpdateInstnace() throws Exception {
+    void testUpdateInstance() throws Exception {
         boolean b = gcpComputeService.updateInstance(instanceName, applicationName);
         assertEquals(true, b);
     }
@@ -73,6 +77,7 @@ public class GcpComputeServiceTest {
     @Test
     void testGcpInstanceList() throws Exception {
         List<Instance> instanceItems = gcpComputeService.listInstance(compute);
+
         System.out.println(instanceItems);
         assertEquals(false, instanceItems.isEmpty());
     }
@@ -120,17 +125,24 @@ public class GcpComputeServiceTest {
 
     @Test
     void testFirewall() throws  Exception{
-//        boolean res = firewallConfigure.config(compute).insert(applicationName);
-//        boolean res = firewallConfigure.config(applicationName).update(applicationName);
+//        boolean res = firewallConfigure.config().insert(applicationName);
+        boolean res2 = firewallConfigure.config().update(applicationName);
 //        firewallConfigure.update(applicationName,"default-allow-mysql");
-        boolean res = firewallConfigure.delete(applicationName,"default-allow-mysql");
-        assertFalse(res);
-
+//        boolean res = firewallConfigure.delete(applicationName,"default-allow-mysql");
+//        assertFalse(res);
+        assertFalse(res2);
     }
 
     @Test
-    void testAccountCreate() throws  Exception{
+    void testAutoIpToFixedIp() throws  Exception{
+        String instanceNatIp = instanceConfigure.getInstanceNatIp();
+        System.out.println(instanceNatIp);
+        boolean insert = addressesConfig.config("fix-ip-01").insert(applicationName);
+        assertFalse(insert);
 
     }
+
+
+
 
 }

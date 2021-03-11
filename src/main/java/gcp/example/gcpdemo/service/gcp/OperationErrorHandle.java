@@ -15,7 +15,16 @@ public abstract class OperationErrorHandle {
      */
     public static  String ZONE_NAME = "us-central1-a";
 
+    /**
+     * Region
+     */
+    public static String REGION = "us-central1";
+
     private static final long OPERATION_TIMEOUT_MILLIS = 60 * 1000;
+
+    public String applicationName = "gcpDemoApplication";
+
+    public String instanceName = "gcp-demo-instance00";
 
 
     public static Operation.Error blockUntilComplete(Compute compute, Operation operation) throws Exception {

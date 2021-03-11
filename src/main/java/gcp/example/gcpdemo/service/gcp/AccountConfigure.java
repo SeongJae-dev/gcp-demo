@@ -27,7 +27,7 @@ public class AccountConfigure extends OperationErrorHandle implements BaseConfig
     }
 
     @Override
-    public Object config(String applicationName) throws IOException {
+    public Object config() throws IOException {
         return null;
     }
 

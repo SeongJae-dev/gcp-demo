@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,15 +19,18 @@ import java.util.List;
 public class FirewallConfigure extends  OperationErrorHandle implements BaseConfigure{
 
     private Firewall firewall;
-    private Compute compute;
+    public Compute compute;
 
     @Autowired
     ComputeService computeService;
 
+    public FirewallConfigure() throws GeneralSecurityException, IOException {
+        this.compute = new ComputeService().createCompute(applicationName);
+    }
 
     @SneakyThrows
     @Override
-    public FirewallConfigure config(String applicationName) throws IOException {
+    public FirewallConfigure config() throws IOException {
         log.info("================== GCP firewallConfig ==================");
         Firewall firewall = new Firewall();
         List<String> sourceRanges = new ArrayList<>();
@@ -53,7 +57,7 @@ public class FirewallConfigure extends  OperationErrorHandle implements BaseConf
     }
     @Override
     public boolean update(String applicationName) throws Exception{
-
+        config();
         Compute.Firewalls.Update update = this.compute.firewalls().update(PROJECT_ID, this.firewall.getName(), this.firewall);
         Operation response = update.execute();
         log.info("firewall update res -> {}", response);
@@ -63,7 +67,7 @@ public class FirewallConfigure extends  OperationErrorHandle implements BaseConf
     }
 
     public boolean update(String applicationName,String resourceName) throws Exception{
-        config(applicationName);
+        config();
         Compute.Firewalls.Update update = this.compute.firewalls().update(PROJECT_ID, resourceName, this.firewall);
         Operation response = update.execute();
         log.info("firewall update res -> {}", response);
@@ -76,7 +80,7 @@ public class FirewallConfigure extends  OperationErrorHandle implements BaseConf
 
     @Override
     public boolean insert(String applicationName) throws Exception {
-        Compute.Firewalls.Insert insert = computeService.createCompute(applicationName).firewalls().insert(PROJECT_ID, firewall);
+        Compute.Firewalls.Insert insert = this.compute.firewalls().insert(PROJECT_ID, firewall);
         Operation response = insert.execute();
         log.info("firewall insert res -> {}", response);
 
@@ -85,7 +89,7 @@ public class FirewallConfigure extends  OperationErrorHandle implements BaseConf
 
     @Override
     public boolean delete(String applicationName, String resourceName) throws Exception {
-        Compute.Firewalls.Delete delete = computeService.createCompute(applicationName).firewalls().delete(PROJECT_ID, resourceName);
+        Compute.Firewalls.Delete delete = this.compute.firewalls().delete(PROJECT_ID, resourceName);
         Operation response = delete.execute();
         log.info("firewall delete res -> {}", response);
 

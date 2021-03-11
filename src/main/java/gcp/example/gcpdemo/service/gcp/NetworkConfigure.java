@@ -1,14 +1,13 @@
 package gcp.example.gcpdemo.service.gcp;
 
 import com.google.api.services.compute.Compute;
-import com.google.api.services.compute.model.AccessConfig;
-import com.google.api.services.compute.model.Network;
-import com.google.api.services.compute.model.NetworkInterface;
-import com.google.api.services.compute.model.NetworkList;
+import com.google.api.services.compute.model.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,7 +24,16 @@ public class NetworkConfigure extends OperationErrorHandle{
 
     private static final String NETWORK_ACCESS_CONFIG = "External NAT";
 
+    String applicationName = "gcpDemoApplication";
 
+    @Autowired
+    InstanceConfigure instanceConfigure;
+
+    Compute compute;
+
+    public NetworkConfigure() throws GeneralSecurityException, IOException {
+        this.compute = new ComputeService().createCompute(applicationName);
+    }
 
     public NetworkList networkList(Compute compute) throws IOException {
         log.info("================== GCP networkList List ==================");
@@ -62,5 +70,11 @@ public class NetworkConfigure extends OperationErrorHandle{
 //        networkInterface.setNetwork();
 
         return networkInterface;
+    }
+
+    public void autoIpToFixedIp() throws IOException {
+        String instanceNatIp = instanceConfigure.getInstanceNatIp();
+        log.info("instance -> {}", instanceNatIp);
+
     }
 }

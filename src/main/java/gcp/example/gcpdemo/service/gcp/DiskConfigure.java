@@ -3,6 +3,7 @@ package gcp.example.gcpdemo.service.gcp;
 import com.google.api.services.compute.Compute;
 import com.google.api.services.compute.model.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -14,6 +15,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DiskConfigure extends OperationErrorHandle{
 
+    @Autowired
+    private ImageConfigure imageConfigure;
 
     public MachineTypeList machineTypeList(Compute compute) throws IOException {
         log.info("================== GCP MachineType List ==================");
@@ -41,7 +44,7 @@ public class DiskConfigure extends OperationErrorHandle{
 
         AttachedDiskInitializeParams initializeParams = new AttachedDiskInitializeParams();
         initializeParams.setDiskName(instanceName);
-        initializeParams.setSourceImage(selectImageName(compute));
+        initializeParams.setSourceImage(imageConfigure.selectImageName(compute));
         initializeParams.setDiskType(
                 String.format(
                         "https://www.googleapis.com/compute/v1/projects/%s/zones/%s/diskTypes/pd-standard",
@@ -51,35 +54,6 @@ public class DiskConfigure extends OperationErrorHandle{
         return disk;
     }
 
-    public String selectImageName(Compute compute) throws IOException {
-        log.info("================== GCP selectImageName ==================");
-        ImageList imageList;
-        String imageProjectId = "ubuntu-os-cloud";
 
-        Compute.Images.List images = compute.images().list(imageProjectId)
-                .setFilter("status=READY");
-
-        do {
-            imageList = images.execute();
-            if (imageList.getItems() == null) {
-                continue;
-            }
-            images.setPageToken(imageList.getNextPageToken());
-        } while (imageList.getNextPageToken() != null);
-
-        return getOSImage(imageList);
-    }
-
-    public String getOSImage(ImageList imageList) {
-        log.info("================== GCP getOSImage ==================");
-
-        return Optional.ofNullable(imageList.getItems())
-                .orElseGet(ArrayList::new)
-                .stream()
-                .map(Image::getSelfLink)
-                .limit(1)
-                .collect(Collectors.joining());
-
-    }
 
 }
