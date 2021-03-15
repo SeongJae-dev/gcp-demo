@@ -49,8 +49,8 @@ public class FirewallConfigure extends  OperationErrorHandle implements BaseConf
         firewall.setAllowed(allowedConfig("tcp", new String[]{"3306"}));
         firewall.setDescription("mysql allow");
         //방화벽 적용 타겟 설정
-//        targetTags.add("test");
-//        firewall.setTargetTags(targetTags);
+        targetTags.add("test");
+        firewall.setTargetTags(targetTags);
         this.firewall = firewall;
         this.compute = computeService.createCompute(applicationName);
         return this;

@@ -109,7 +109,7 @@ public class InstanceConfigure extends OperationErrorHandle{
         List<Metadata.Items> items = new ArrayList<>();
         Metadata.Items item = new Metadata.Items();
         item.setKey("startup-script");
-        item.setValue(createUserScript("test"));
+        item.setValue(createUserScript("gitsjcho"));
         items.add(item);
         items.add(createSshSettings());
         metadata.setItems(items);
@@ -123,7 +123,7 @@ public class InstanceConfigure extends OperationErrorHandle{
     public Metadata.Items createSshSettings(){
         Metadata.Items item = new Metadata.Items();
         StringBuilder builder = new StringBuilder();
-        builder.append("");
+        builder.append("gitsjcho:ssh-rsa ");
         item.setKey("ssh-keys");
         item.setValue(builder.toString());
 
