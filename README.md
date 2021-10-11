@@ -1,6 +1,13 @@
 # GCP-Demo
 
 > GCP Cloud SDK 연동하여 GCP에 Computer Instance를 조작 및 관리하는 데모 프로젝트 입니다. 
+
+
+## 실행 방법
+> 해당 데모 프로젝트 연동 및 테스트를 위해서는 SDK 설치 및 SDK 사용 인증 및 권한 부여가 필요합니다. 
+> 
+> 참고 : Cloud SDK 도구 사용 방법 참고 https://cloud.google.com/sdk/docs/authorizing
+
 ---
 ## Computer Instance  Test
 
